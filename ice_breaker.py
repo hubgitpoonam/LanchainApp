@@ -6,6 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI
 from third_parties.linkedIn import scrape_linkedin_profile
+from agent.LinkedIn_agent_package import lookup as linkedin_lookup_agent
 
 # Load the environment variables from the .env file
 load_dotenv()
@@ -14,15 +15,14 @@ endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 api_key = os.getenv("AZURE_OPENAI_API_KEY")
 deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
-if __name__ == "__main__":
-
-    print("Hello Langchain")
-
+def ice_breaker_with(name: str):
+    linkedin_username = linkedin_lookup_agent(name = name)
+    linkedin_data = scrape_linkedin_profile(linkedin_profile_url=linkedin_username)
     summary_templates = """
-    Given the LinkedIn information {information} about a person, I want you to create:
-    1. A short summary
-    2. Two interesting facts about them
-    """
+        Given the LinkedIn information {information} about a person, I want you to create:
+        1. A short summary
+        2. Two interesting facts about them
+        """
 
     summary_prompt_template = PromptTemplate(
         input_variables=["information"], template=summary_templates
@@ -30,11 +30,11 @@ if __name__ == "__main__":
 
     # Example LLM setup
     llm = AzureChatOpenAI(
-         deployment_name=deployment,
-         openai_api_version="2024-02-01",
-         azure_endpoint=endpoint,
-         api_key=api_key,
-     )
+        deployment_name=deployment,
+        openai_api_version="2024-02-01",
+        azure_endpoint=endpoint,
+        api_key=api_key,
+    )
 
     # llm = ChatOllama(model="mistral")
 
@@ -48,3 +48,11 @@ if __name__ == "__main__":
         print(res)
     else:
         print("No data found for the given LinkedIn profile.")
+
+
+if __name__ == "__main__":
+
+    print("Ice Breaker Enter")
+    ice_breaker_with(name="Poonam Kumari")
+
+

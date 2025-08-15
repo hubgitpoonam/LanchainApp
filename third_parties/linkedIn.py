@@ -13,6 +13,7 @@ def scrape_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
 
     if mock:
         linkedin_profile_url = "https://gist.githubusercontent.com/emarco177/859ec7d786b45d8e3e3f688c6c9139d8/raw/5eaf8e46dc29a98612c8fe0c774123a7a2ac4575/eden-marco-scrapin.json"
+        #linkedin_profile_url = "https://gist.githubusercontent.com/hubgitpoonam/6940f2117dc0a086bc61f80690ad545c/raw/46a3a82105e20bf7e3bce8c5b6c8b53e863de684/poonam"
         response = requests.get(
             linkedin_profile_url,
             timeout=10,
@@ -50,5 +51,6 @@ def scrape_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
 
 if __name__ == "__main__":
     print(scrape_linkedin_profile(
-        linkedin_profile_url="https://www.linkedin.com/in/eden-marco/"
+        #linkedin_profile_url="https://www.linkedin.com/in/eden-marco/"
+        linkedin_profile_url = "https://www.linkedin.com/in/poonam-kumari-430b55229/"
     ))
