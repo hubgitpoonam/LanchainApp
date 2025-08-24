@@ -4,7 +4,7 @@ import os
 from langchain.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 
-from OutputParser import summary_parser
+from OutputParser import summary_parser, Summary
 from third_parties.linkedIn import scrape_linkedin_profile
 from agent.LinkedIn_agent_package import lookup as linkedin_lookup_agent
 from third_parties.fetchtweepy import scrape_user_tweets
@@ -17,13 +17,17 @@ api_key = os.getenv("AZURE_OPENAI_API_KEY")
 deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 
-def ice_breaker_with(name: str, twitter_handle: str = None):
+def ice_breaker_with(name: str, twitter_handle: str = None)->tuple[Summary, str]:
     # 1. LinkedIn Lookup
     linkedin_username = linkedin_lookup_agent(name=name)
-
+    
+    # If no valid LinkedIn URL found, create a default one from the name
     if "linkedin.com/in/" not in linkedin_username:
-        linkedin_username = "https://www.linkedin.com/in/poonam-kumari-430b55229/"
-
+        # Remove spaces and special characters, convert to lowercase
+        formatted_name = name.lower().replace(" ", "-")
+        linkedin_username = f"https://www.linkedin.com/in/{formatted_name}"
+    
+    print(f"Using LinkedIn URL: {linkedin_username}")
     linkedin_data = scrape_linkedin_profile(linkedin_profile_url=linkedin_username)
 
     # 2. Tweets (use mock if API fails)
@@ -71,12 +75,13 @@ def ice_breaker_with(name: str, twitter_handle: str = None):
     # chain = summary_prompt_template | llm | StrOutputParser()
     chain = summary_prompt_template | llm | summary_parser
 
-    res = chain.invoke({
+    res:Summary = chain.invoke({
         "linkedin_info": linkedin_data,
         "twitter_info": twitter_data
     })
 
-    print(res)
+    #print(res)
+    return res, linkedin_data.get("photoUrl")
 
 
 if __name__ == "__main__":
